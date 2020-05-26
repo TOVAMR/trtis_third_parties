@@ -1,0 +1,21 @@
+sudo apt-get install libc6-armel-cross libc6-dev-armel-cross binutils-arm-linux-gnueabi libncurses5-dev
+sudo apt-get install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+git clone https://github.com/madler/zlib.git
+cd zlib
+git checkout tags/v1.2.11
+mkdir build && cd build
+cmake -DCMAKE_C_COMPILER=/usr/bin/arm-linux-gnueabihf-gcc-7 -DCMAKE_AR=/usr/bin/arm-linux-gnueabihf-ar -DCMAKE_RANLIB=/usr/bin/arm-linux-gnueabihf-ranlib ..
+make -j4
+sudo make install && sudo ldconfig
+cd ../..
+
+git clone "https://github.com/openssl/openssl.git"
+cd openssl
+./Configure linux-armv4 -march=armv7  --prefix=/usr/local/openssl/ --openssldir=/usr/local/openssl
+make CC=/usr/bin/arm-linux-gnueabihf-gcc AR=/usr/bin/arm-linux-gnueabihf-ar RANLIB=/usr/bin/arm-linux-gnueabihf-ranlib -j4
+sudo make install
+cd ..
+mkdir build && cd build
+cmake -DOPENSSL_ROOT_DIR=/usr/local/openssl  -DZLIB_LIBRARY=/usr/local/lib/libz.so.1 ..
+make -j4
